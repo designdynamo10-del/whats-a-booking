@@ -14,7 +14,153 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      auto_replies: {
+        Row: {
+          business_id: string
+          created_at: string
+          id: string
+          keywords: string
+          reply_message: string
+          reply_type: string | null
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          id?: string
+          keywords: string
+          reply_message: string
+          reply_type?: string | null
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          id?: string
+          keywords?: string
+          reply_message?: string
+          reply_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "auto_replies_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bookings: {
+        Row: {
+          appointment_date: string
+          appointment_time: string
+          business_id: string
+          created_at: string
+          customer_phone: string
+          id: string
+          status: string | null
+        }
+        Insert: {
+          appointment_date: string
+          appointment_time: string
+          business_id: string
+          created_at?: string
+          customer_phone: string
+          id?: string
+          status?: string | null
+        }
+        Update: {
+          appointment_date?: string
+          appointment_time?: string
+          business_id?: string
+          created_at?: string
+          customer_phone?: string
+          id?: string
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      businesses: {
+        Row: {
+          business_name: string
+          business_type: string
+          created_at: string
+          id: string
+          phone: string
+          plan: string | null
+          updated_at: string
+          user_id: string
+          working_hours_end: string | null
+          working_hours_start: string | null
+        }
+        Insert: {
+          business_name: string
+          business_type: string
+          created_at?: string
+          id?: string
+          phone: string
+          plan?: string | null
+          updated_at?: string
+          user_id: string
+          working_hours_end?: string | null
+          working_hours_start?: string | null
+        }
+        Update: {
+          business_name?: string
+          business_type?: string
+          created_at?: string
+          id?: string
+          phone?: string
+          plan?: string | null
+          updated_at?: string
+          user_id?: string
+          working_hours_end?: string | null
+          working_hours_start?: string | null
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          business_id: string
+          created_at: string
+          customer_phone: string
+          direction: string
+          id: string
+          message_text: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          customer_phone: string
+          direction: string
+          id?: string
+          message_text: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          customer_phone?: string
+          direction?: string
+          id?: string
+          message_text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
