@@ -263,20 +263,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-border py-8 px-4">
-        <div className="container max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-md gradient-hero flex items-center justify-center">
-              <MessageCircle className="w-3 h-3 text-primary-foreground" />
-            </div>
-            <span className="font-display font-semibold text-sm text-foreground">WA Booker</span>
-          </div>
-          <p className="text-xs text-muted-foreground">
-            © 2026 WA Booker. All rights reserved.
-          </p>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
