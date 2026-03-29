@@ -24,6 +24,7 @@ export default function Footer() {
               <li><Link to="/#features" className="hover:text-foreground transition-colors">Features</Link></li>
               <li><Link to="/#pricing" className="hover:text-foreground transition-colors">Pricing</Link></li>
               <li><Link to="/signup" className="hover:text-foreground transition-colors">Get Started</Link></li>
+              <li><Link to="/faq" className="hover:text-foreground transition-colors">FAQ</Link></li>
             </ul>
           </div>
 
