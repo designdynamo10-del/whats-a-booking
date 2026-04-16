@@ -10,6 +10,7 @@ import {
   MessageCircle,
   Menu,
   X,
+  Smartphone,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
@@ -19,6 +20,7 @@ const navItems = [
   { icon: CalendarCheck, label: "Bookings", path: "/dashboard/bookings" },
   { icon: MessageSquare, label: "Auto Replies", path: "/dashboard/auto-replies" },
   { icon: Send, label: "Broadcast", path: "/dashboard/broadcast" },
+  { icon: Smartphone, label: "WhatsApp", path: "/dashboard/whatsapp" },
   { icon: Settings, label: "Settings", path: "/dashboard/settings" },
 ];
 
