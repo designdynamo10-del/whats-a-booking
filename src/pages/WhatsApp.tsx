@@ -17,6 +17,12 @@ interface AuthState {
   qr: string;
 }
 
+interface ApiResponse {
+  status?: WAState;
+  state?: WAState;
+  qr: string;
+}
+
 export default function WhatsApp() {
   const [auth, setAuth] = useState<AuthState | null>(null);
   const [loading, setLoading] = useState(true);
