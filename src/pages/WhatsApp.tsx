@@ -85,12 +85,16 @@ export default function WhatsApp() {
 
   useEffect(() => {
     fetchState();
-    // Poll while connecting / disconnected to refresh QR / state
+  }, [fetchState]);
+
+  // Poll while not connected to refresh QR / state
+  useEffect(() => {
+    if (auth?.state === "connected") return;
     const interval = setInterval(() => {
       fetchState(true);
-    }, 5000);
+    }, 2000);
     return () => clearInterval(interval);
-  }, [fetchState]);
+  }, [auth?.state, fetchState]);
 
   const stateBadge = () => {
     if (!auth) return null;
