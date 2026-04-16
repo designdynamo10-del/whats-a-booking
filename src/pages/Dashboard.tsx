@@ -23,6 +23,7 @@ export default function Dashboard() {
     messagesOut: 0,
   });
   const [recentBookings, setRecentBookings] = useState<any[]>([]);
+  const { isAuthed, loading: waLoading } = useWhatsAppStatus();
 
   useEffect(() => {
     loadData();
@@ -73,6 +74,19 @@ export default function Dashboard() {
           <h1 className="font-display text-2xl font-bold text-foreground">Dashboard</h1>
           <p className="text-sm text-muted-foreground">Overview of your WhatsApp bookings</p>
         </div>
+
+        {!waLoading && !isAuthed && (
+          <Alert variant="destructive">
+            <AlertTriangle className="w-4 h-4" />
+            <AlertTitle>WhatsApp not connected</AlertTitle>
+            <AlertDescription className="flex items-center justify-between gap-3 flex-wrap">
+              <span>Connect your WhatsApp to start receiving bookings and sending messages.</span>
+              <Button asChild size="sm" variant="outline">
+                <Link to="/dashboard/whatsapp">Connect now</Link>
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {statCards.map((s) => (
