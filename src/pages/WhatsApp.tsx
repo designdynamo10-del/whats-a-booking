@@ -104,22 +104,14 @@ export default function WhatsApp() {
     fetchState();
   }, [fetchState]);
 
-  // Poll while not connected to refresh QR / state
+  // Poll only while connecting (waiting for QR / scan)
   useEffect(() => {
-    if (auth?.state === "connected") return;
+    if (auth?.state !== "connecting") return;
     const interval = setInterval(() => {
       fetchState(true);
     }, 2000);
     return () => clearInterval(interval);
   }, [auth?.state, fetchState]);
-
-  // Auto re-create session when disconnected
-  useEffect(() => {
-    if (auth?.state === "disconnected" && !actionLoading) {
-      createSession();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [auth?.state]);
 
   const stateBadge = () => {
     if (!auth) return null;
