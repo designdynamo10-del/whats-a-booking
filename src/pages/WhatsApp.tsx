@@ -22,17 +22,22 @@ export default function WhatsApp() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
 
-  const getToken = async () => {
+  const getAuth = async () => {
     const { data } = await supabase.auth.getSession();
-    return data.session?.access_token;
+    return {
+      token: data.session?.access_token,
+      userId: data.session?.user?.id,
+    };
   };
+
+  const buildUrl = (userId: string) => `${API_URL}?userId=${encodeURIComponent(userId)}`;
 
   const fetchState = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
     try {
-      const token = await getToken();
-      if (!token) return;
-      const res = await fetch(API_URL, {
+      const { token, userId } = await getAuth();
+      if (!token || !userId) return;
+      const res = await fetch(buildUrl(userId), {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("Failed to fetch state");
@@ -48,9 +53,9 @@ export default function WhatsApp() {
   const createSession = async () => {
     setActionLoading(true);
     try {
-      const token = await getToken();
-      if (!token) return;
-      const res = await fetch(API_URL, {
+      const { token, userId } = await getAuth();
+      if (!token || !userId) return;
+      const res = await fetch(buildUrl(userId), {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -67,9 +72,9 @@ export default function WhatsApp() {
   const disconnect = async () => {
     setActionLoading(true);
     try {
-      const token = await getToken();
-      if (!token) return;
-      const res = await fetch(API_URL, {
+      const { token, userId } = await getAuth();
+      if (!token || !userId) return;
+      const res = await fetch(buildUrl(userId), {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
