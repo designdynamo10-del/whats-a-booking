@@ -157,9 +157,11 @@ export default function WhatsApp() {
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
               </div>
-            ) : !auth ? (
+            ) : !auth || auth.state === "disconnected" ? (
               <div className="text-center py-8 space-y-4">
-                <p className="text-sm text-muted-foreground">No session found</p>
+                <p className="text-sm text-muted-foreground">
+                  {auth?.state === "disconnected" ? "Session disconnected" : "No session found"}
+                </p>
                 <Button onClick={createSession} disabled={actionLoading} variant="hero">
                   {actionLoading && <Loader2 className="w-4 h-4 animate-spin" />}
                   Start WhatsApp session
@@ -201,18 +203,10 @@ export default function WhatsApp() {
                     </div>
                   )}
                 </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => fetchState()} disabled={actionLoading}>
-                    <RefreshCw className="w-4 h-4" />
-                    Refresh
-                  </Button>
-                  {auth.state === "disconnected" && (
-                    <Button variant="hero" onClick={createSession} disabled={actionLoading}>
-                      {actionLoading && <Loader2 className="w-4 h-4 animate-spin" />}
-                      Restart session
-                    </Button>
-                  )}
-                </div>
+                <Button variant="outline" onClick={() => fetchState()} disabled={actionLoading}>
+                  <RefreshCw className="w-4 h-4" />
+                  Refresh
+                </Button>
               </div>
             )}
           </CardContent>
