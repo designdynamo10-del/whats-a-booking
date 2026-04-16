@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard";
 import Bookings from "./pages/Bookings";
 import AutoReplies from "./pages/AutoReplies";
 import Broadcast from "./pages/Broadcast";
+import WhatsApp from "./pages/WhatsApp";
 import DashboardSettings from "./pages/DashboardSettings";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -36,6 +37,7 @@ const App = () => (
           <Route path="/dashboard/bookings" element={<Bookings />} />
           <Route path="/dashboard/auto-replies" element={<AutoReplies />} />
           <Route path="/dashboard/broadcast" element={<Broadcast />} />
+          <Route path="/dashboard/whatsapp" element={<WhatsApp />} />
           <Route path="/dashboard/settings" element={<DashboardSettings />} />
           <Route path="/about" element={<About />} />
           <Route path="/contact" element={<Contact />} />
