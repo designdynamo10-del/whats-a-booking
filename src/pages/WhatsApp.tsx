@@ -108,7 +108,7 @@ export default function WhatsApp() {
       connecting: { label: "Connecting", className: "bg-muted text-muted-foreground", icon: Loader2 },
       disconnected: { label: "Disconnected", className: "bg-destructive/10 text-destructive", icon: XCircle },
     };
-    const s = map[auth.state];
+    const s = map[auth.state] ?? map.disconnected;
     const Icon = s.icon;
     return (
       <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${s.className}`}>
