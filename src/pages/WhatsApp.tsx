@@ -113,6 +113,14 @@ export default function WhatsApp() {
     return () => clearInterval(interval);
   }, [auth?.state, fetchState]);
 
+  // Auto re-create session when disconnected
+  useEffect(() => {
+    if (auth?.state === "disconnected" && !actionLoading) {
+      createSession();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth?.state]);
+
   const stateBadge = () => {
     if (!auth) return null;
     const map: Record<WAState, { label: string; className: string; icon: any }> = {
