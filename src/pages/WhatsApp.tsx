@@ -17,6 +17,12 @@ interface AuthState {
   qr: string;
 }
 
+interface ApiResponse {
+  status?: WAState;
+  state?: WAState;
+  qr: string;
+}
+
 export default function WhatsApp() {
   const [auth, setAuth] = useState<AuthState | null>(null);
   const [loading, setLoading] = useState(true);
@@ -40,9 +46,15 @@ export default function WhatsApp() {
       const res = await fetch(buildUrl(userId), {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error("Failed to fetch state");
-      const data: AuthState = await res.json();
-      setAuth(data);
+      if (!res.ok) {
+        if (res.status === 404) {
+          setAuth(null);
+          return;
+        }
+        throw new Error("Failed to fetch state");
+      }
+      const data: ApiResponse = await res.json();
+      setAuth({ state: (data.status ?? data.state ?? "disconnected"), qr: data.qr ?? "" });
     } catch (e) {
       if (!silent) toast.error("Could not reach WhatsApp service");
     } finally {
@@ -100,6 +112,14 @@ export default function WhatsApp() {
     }, 2000);
     return () => clearInterval(interval);
   }, [auth?.state, fetchState]);
+
+  // Auto re-create session when disconnected
+  useEffect(() => {
+    if (auth?.state === "disconnected" && !actionLoading) {
+      createSession();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auth?.state]);
 
   const stateBadge = () => {
     if (!auth) return null;
