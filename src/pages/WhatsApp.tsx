@@ -10,23 +10,16 @@ import { QRCodeSVG } from "qrcode.react";
 
 const API_URL = "https://wa-booker.onrender.com";
 
-type WAState = "connecting" | "connected" | "disconnected";
-
-interface AuthState {
-  state: WAState;
+interface SessionState {
   qr: string;
-}
-
-interface ApiResponse {
-  status?: WAState;
-  state?: WAState;
-  qr: string;
+  connected: boolean;
 }
 
 export default function WhatsApp() {
-  const [auth, setAuth] = useState<AuthState | null>(null);
+  const [session, setSession] = useState<SessionState | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [notFound, setNotFound] = useState(false);
 
   const getAuth = async () => {
     const { data } = await supabase.auth.getSession();
@@ -48,13 +41,15 @@ export default function WhatsApp() {
       });
       if (!res.ok) {
         if (res.status === 404) {
-          setAuth(null);
+          setSession(null);
+          setNotFound(true);
           return;
         }
         throw new Error("Failed to fetch state");
       }
-      const data: ApiResponse = await res.json();
-      setAuth({ state: (data.status ?? data.state ?? "disconnected"), qr: data.qr ?? "" });
+      const data = await res.json();
+      setNotFound(false);
+      setSession({ qr: data.qr ?? "", connected: !!data.connected });
     } catch (e) {
       if (!silent) toast.error("Could not reach WhatsApp service");
     } finally {
@@ -92,7 +87,8 @@ export default function WhatsApp() {
       });
       if (!res.ok) throw new Error("Failed to disconnect");
       toast.success("Disconnected");
-      await fetchState();
+      setSession(null);
+      setNotFound(true);
     } catch (e) {
       toast.error("Could not disconnect");
     } finally {
@@ -104,28 +100,37 @@ export default function WhatsApp() {
     fetchState();
   }, [fetchState]);
 
-  // Poll only while connecting (waiting for QR / scan)
+  // Poll while session exists but is not yet connected
   useEffect(() => {
-    if (auth?.state !== "connecting") return;
+    if (!session || session.connected) return;
     const interval = setInterval(() => {
       fetchState(true);
     }, 2000);
     return () => clearInterval(interval);
-  }, [auth?.state, fetchState]);
+  }, [session, fetchState]);
 
   const stateBadge = () => {
-    if (!auth) return null;
-    const map: Record<WAState, { label: string; className: string; icon: any }> = {
-      connected: { label: "Connected", className: "bg-secondary text-secondary-foreground", icon: CheckCircle2 },
-      connecting: { label: "Connecting", className: "bg-muted text-muted-foreground", icon: Loader2 },
-      disconnected: { label: "Disconnected", className: "bg-destructive/10 text-destructive", icon: XCircle },
-    };
-    const s = map[auth.state] ?? map.disconnected;
-    const Icon = s.icon;
+    if (loading) return null;
+    if (!session) {
+      return (
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-destructive/10 text-destructive">
+          <XCircle className="w-3.5 h-3.5" />
+          Disconnected
+        </span>
+      );
+    }
+    if (session.connected) {
+      return (
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">
+          <CheckCircle2 className="w-3.5 h-3.5" />
+          Connected
+        </span>
+      );
+    }
     return (
-      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${s.className}`}>
-        <Icon className={`w-3.5 h-3.5 ${auth.state === "connecting" ? "animate-spin" : ""}`} />
-        {s.label}
+      <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
+        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+        Connecting
       </span>
     );
   };
@@ -157,17 +162,15 @@ export default function WhatsApp() {
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
               </div>
-            ) : !auth || auth.state === "disconnected" ? (
+            ) : !session || notFound ? (
               <div className="text-center py-8 space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  {auth?.state === "disconnected" ? "Session disconnected" : "No session found"}
-                </p>
+                <p className="text-sm text-muted-foreground">No active session</p>
                 <Button onClick={createSession} disabled={actionLoading} variant="hero">
                   {actionLoading && <Loader2 className="w-4 h-4 animate-spin" />}
                   Start WhatsApp session
                 </Button>
               </div>
-            ) : auth.state === "connected" ? (
+            ) : session.connected ? (
               <div className="space-y-4">
                 <Alert>
                   <CheckCircle2 className="w-4 h-4" />
@@ -184,10 +187,10 @@ export default function WhatsApp() {
             ) : (
               <div className="space-y-4">
                 <div className="flex flex-col items-center gap-4 p-6 bg-muted/30 rounded-lg border border-border">
-                  {auth.qr ? (
+                  {session.qr ? (
                     <>
                       <div className="bg-background p-4 rounded-lg">
-                        <QRCodeSVG value={auth.qr} size={220} />
+                        <QRCodeSVG value={session.qr} size={220} />
                       </div>
                       <div className="text-center max-w-sm">
                         <p className="text-sm font-medium text-foreground mb-1">Scan with WhatsApp</p>
